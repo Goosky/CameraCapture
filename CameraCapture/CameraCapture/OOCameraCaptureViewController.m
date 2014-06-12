@@ -46,6 +46,10 @@
     [self.view.layer addSublayer:preview];
     _captureView = [[UIImageView alloc] initWithFrame:CGRectMake(10, 10, self.view.bounds.size.width*0.4, self.view.bounds.size.height*0.3)];
     [self.view addSubview:_captureView];
+//    _captureView.transform = CGAffineTransformMakeRotation(M_PI*3.5);
+//    CGAffineTransform transform = CGAffineTransformMakeTranslation(self.view.bounds.size.height*0.3, self.view.bounds.size.width*0.4);
+//    transform = CGAffineTransformRotate(transform, M_PI / 2.0 );
+//    _captureView.transform = transform;
 }
 
 - (void)dealloc
