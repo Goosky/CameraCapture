@@ -55,6 +55,7 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[OOCameraCapture capture] stopCapture];
 }
 
 - (void)video
