@@ -7,12 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "AVFoundation/AVCaptureSession.h"
-#import "AVFoundation/AVCaptureOutput.h"
-#import "AVFoundation/AVCaptureDevice.h"
-#import "AVFoundation/AVCaptureInput.h"
-#import "AVFoundation/AVCaptureVideoPreviewLayer.h"
-#import "AVFoundation/AVMediaFormat.h"
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 #define kUpdateCapture  @"UpdateCapture"
 
@@ -24,5 +20,6 @@
 - (void)startCapture;
 - (void)stopCapture;
 - (NSData *)captureData;
+- (NSData *)audioData;
 
 @end

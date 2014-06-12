@@ -63,6 +63,16 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSData *data = [[OOCameraCapture capture] captureData];
         _captureView.image = [UIImage imageWithData:data];
+        NSData *audio = [[OOCameraCapture capture] audioData];
+        NSError *error;
+        AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:audio error:&error];
+        [player prepareToPlay];
+        if (error) {
+//            @throw @"error";
+            NSLog(@"errrrr%@",error);
+            return ;
+        }
+        [player play];
     });
 }
 

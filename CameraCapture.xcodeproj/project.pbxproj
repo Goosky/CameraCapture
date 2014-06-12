@@ -22,6 +22,7 @@
 		00AC792219497E7300BD6B39 /* OOCameraCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 00AC792119497E7300BD6B39 /* OOCameraCapture.m */; };
 		00AC792419497E9800BD6B39 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00AC792319497E9800BD6B39 /* AVFoundation.framework */; };
 		00AC792719497F0F00BD6B39 /* OOCameraCaptureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 00AC792619497F0F00BD6B39 /* OOCameraCaptureViewController.m */; };
+		00AC79291949931C00BD6B39 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00AC79281949931C00BD6B39 /* MediaPlayer.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,6 +57,7 @@
 		00AC792319497E9800BD6B39 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		00AC792519497F0F00BD6B39 /* OOCameraCaptureViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OOCameraCaptureViewController.h; sourceTree = "<group>"; };
 		00AC792619497F0F00BD6B39 /* OOCameraCaptureViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OOCameraCaptureViewController.m; sourceTree = "<group>"; };
+		00AC79281949931C00BD6B39 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00AC79291949931C00BD6B39 /* MediaPlayer.framework in Frameworks */,
 				00AC792419497E9800BD6B39 /* AVFoundation.framework in Frameworks */,
 				00AC78F319497DF200BD6B39 /* CoreGraphics.framework in Frameworks */,
 				00AC78F519497DF200BD6B39 /* UIKit.framework in Frameworks */,
@@ -105,6 +108,7 @@
 		00AC78EF19497DF200BD6B39 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				00AC79281949931C00BD6B39 /* MediaPlayer.framework */,
 				00AC792319497E9800BD6B39 /* AVFoundation.framework */,
 				00AC78F019497DF200BD6B39 /* Foundation.framework */,
 				00AC78F219497DF200BD6B39 /* CoreGraphics.framework */,
@@ -464,6 +468,7 @@
 				00AC791B19497DF200BD6B39 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		00AC791C19497DF200BD6B39 /* Build configuration list for PBXNativeTarget "CameraCaptureTests" */ = {
 			isa = XCConfigurationList;
@@ -472,6 +477,7 @@
 				00AC791E19497DF200BD6B39 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

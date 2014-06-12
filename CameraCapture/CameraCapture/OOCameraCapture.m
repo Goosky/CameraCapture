@@ -10,11 +10,13 @@
 
 static OOCameraCapture *_theServer;
 
-@interface OOCameraCapture()<AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface OOCameraCapture()<AVCaptureVideoDataOutputSampleBufferDelegate,AVCaptureAudioDataOutputSampleBufferDelegate>
 {
     AVCaptureVideoPreviewLayer *_preLayer;
-    AVCaptureSession *_session;
-    NSData *_imageData;
+    AVCaptureSession *_captureSession;
+    AVCaptureSession *_audioSession;
+    NSData *_videoData;
+    NSData *_audioData;
 }
 @end
 
@@ -31,25 +33,26 @@ static OOCameraCapture *_theServer;
     {
         _theServer = [[OOCameraCapture alloc] init];
         [_theServer setupCaptureSession];
+        [_theServer setupAudioSession];
     }
 }
 
 // Create and configure a capture session and start it running
 - (void)setupCaptureSession
 {
-    if (_session != nil) {
+    if (_captureSession != nil) {
         return;
     }
     
     NSError *error = nil;
 	
     // Create the session
-    _session = [[AVCaptureSession alloc] init];
+    _captureSession = [[AVCaptureSession alloc] init];
 	
     // Configure the session to produce lower resolution video frames, if your
     // processing algorithm can cope. We'll specify medium quality for the
     // chosen device.
-    _session.sessionPreset = AVCaptureSessionPresetMedium;
+    _captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 	
     // Find a suitable AVCaptureDevice
     AVCaptureDevice *device = [self getFrontCamera];
@@ -57,14 +60,19 @@ static OOCameraCapture *_theServer;
     // Create a device input with the device and add it to the session.
     AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device
 																		error:&error];
-    if (!input) {
+    if (error) {
         // Handling the error appropriately.
+        NSLog(@"Error Start capture video=%@", error);
+        @throw [NSException exceptionWithName:[NSString stringWithFormat:@"Error Start capture video=%@", error] reason:[NSString stringWithFormat:@"Error Start capture video=%@", error] userInfo:nil];
     }
-    [_session addInput:input];
+    
+    if ([_captureSession canAddInput:input]) {
+        [_captureSession addInput:input];
+    }
 	
     // Create a VideoDataOutput and add it to the session
     AVCaptureVideoDataOutput *output = [[AVCaptureVideoDataOutput alloc] init];
-    [_session addOutput:output];
+    [_captureSession addOutput:output];
 	
     // Configure your output.
     dispatch_queue_t queue = dispatch_queue_create("myQueue", NULL);
@@ -78,21 +86,64 @@ static OOCameraCapture *_theServer;
                             nil];
 //    output.minFrameDuration = CMTimeMake(1, 15);
     
-	_preLayer = [AVCaptureVideoPreviewLayer layerWithSession: _session];
+	_preLayer = [AVCaptureVideoPreviewLayer layerWithSession: _captureSession];
     _preLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+}
+
+- (void)setupAudioSession
+{
+    if (_audioSession != nil) {
+        return;
+    }
+    
+    NSError *error = nil;
+	
+    // Create the session
+    _audioSession = [[AVCaptureSession alloc] init];
+    
+    _audioSession.sessionPreset = AVCaptureSessionPresetMedium;
+    
+    // Setup Audio input
+    AVCaptureDevice *audioDevice = [AVCaptureDevice
+                                    defaultDeviceWithMediaType:AVMediaTypeAudio];
+    AVCaptureDeviceInput *captureAudioInput = [AVCaptureDeviceInput deviceInputWithDevice:audioDevice error:&error];
+    if(error){
+        NSLog(@"Error Start capture Audio=%@", error);
+        @throw [NSException exceptionWithName:[NSString stringWithFormat:@"Error Start capture Audio=%@", error] reason:[NSString stringWithFormat:@"Error Start capture Audio=%@", error] userInfo:nil];
+    }
+    
+    if ([_audioSession canAddInput:captureAudioInput]){
+        [_audioSession addInput:captureAudioInput];
+    }
+    
+    AVCaptureAudioDataOutput *audioCaptureOutput = [[AVCaptureAudioDataOutput alloc] init];
+    
+    if ([_audioSession canAddOutput:audioCaptureOutput]){
+        [_audioSession addOutput:audioCaptureOutput];
+    }
+    
+    dispatch_queue_t audioQueue= dispatch_queue_create("audioQueue", NULL);
+    [audioCaptureOutput setSampleBufferDelegate:self queue:audioQueue];
 }
 
 - (void)startCapture
 {
-    [_session startRunning];
+    if (_captureSession && _audioSession) {
+        [_captureSession startRunning];
+        [_audioSession startRunning];
+    }
 }
 
 - (void)stopCapture
 {
-    if (_session)
+    if (_captureSession)
     {
-        [_session stopRunning];
-        _session = nil;
+        [_captureSession stopRunning];
+        _captureSession = nil;
+    }
+    if (_audioSession) {
+        [_audioSession stopRunning];
+        _audioSession = nil;
     }
 }
 
@@ -105,7 +156,12 @@ static OOCameraCapture *_theServer;
 
 - (NSData *)captureData
 {
-    return _imageData;
+    return _videoData;
+}
+
+- (NSData *)audioData
+{
+    return _audioData;
 }
 
 - (AVCaptureDevice *)getFrontCamera
@@ -165,11 +221,42 @@ static OOCameraCapture *_theServer;
     return (image);
 }
 
-#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
+- (NSData *)audioDataFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
+{
+    AudioBufferList audioBufferList;
+    NSMutableData *data= [NSMutableData data];
+    CMBlockBufferRef blockBuffer;
+    CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(sampleBuffer, NULL, &audioBufferList, sizeof(audioBufferList), NULL, NULL, 0, &blockBuffer);
+    
+    for( int y=0; y< audioBufferList.mNumberBuffers; y++ ){
+        
+        AudioBuffer audioBuffer = audioBufferList.mBuffers[y];
+        Float32 *frame = (Float32*)audioBuffer.mData;
+        
+        [data appendBytes:frame length:audioBuffer.mDataByteSize];
+        
+    }
+    
+    CFRelease(blockBuffer);
+//    CFRelease(ref);
+//    NSError *error ;
+//    AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:data error:&error];
+//    if (error) {
+//        NSLog(@"============eoor%@",error);
+//    }
+//    [player play];
+    return data;
+}
+
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate && AVCaptureAudioDataOutputSampleBufferDelegate
 
 - (void) captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
-    _imageData = UIImageJPEGRepresentation([self imageFromSampleBuffer:sampleBuffer], 0.3);
+    if ([captureOutput isKindOfClass:[AVCaptureAudioDataOutput class]]) {
+        _audioData = [self audioDataFromSampleBuffer:sampleBuffer];
+    }else{
+        _videoData = UIImageJPEGRepresentation([self imageFromSampleBuffer:sampleBuffer], 0.3);
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:kUpdateCapture object:nil];
 }
 
