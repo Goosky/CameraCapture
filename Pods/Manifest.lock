@@ -1,0 +1,10 @@
+PODS:
+  - AFSoundManager (1.1.1)
+
+DEPENDENCIES:
+  - AFSoundManager (~> 1.1.1)
+
+SPEC CHECKSUMS:
+  AFSoundManager: 986610e8df00f80402943b3d1988bc21647bda84
+
+COCOAPODS: 0.33.1
