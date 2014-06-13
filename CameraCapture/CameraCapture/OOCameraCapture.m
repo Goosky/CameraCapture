@@ -174,7 +174,6 @@ static OOCameraCapture *_theServer;
             return device;
     }
     return [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    
 }
 
 #pragma mark - Common

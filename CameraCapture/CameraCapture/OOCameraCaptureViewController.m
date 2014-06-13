@@ -60,19 +60,24 @@
 
 - (void)video
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        
         NSData *data = [[OOCameraCapture capture] captureData];
-        _captureView.image = [UIImage imageWithData:data];
         NSData *audio = [[OOCameraCapture capture] audioData];
-        NSError *error;
-        AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:audio error:&error];
-        [player prepareToPlay];
-        if (error) {
-//            @throw @"error";
-            NSLog(@"errrrr%@",error);
-            return ;
-        }
-        [player play];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _captureView.image = [UIImage imageWithData:data];
+            NSError *error;
+//            AVAudioPlayer *player = [[AVAudioPlayer alloc] initWithData:audio error:&error];
+            //        [player prepareToPlay];
+            if (error) {
+                //            @throw @"error";
+                NSLog(@"errrrr%@",error);
+                return ;
+            }
+            //        [player play];
+        });
+
     });
 }
 
